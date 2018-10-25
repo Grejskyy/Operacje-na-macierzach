@@ -2,9 +2,11 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include "fraction.cpp"
 
+using namespace boost::multiprecision;
 using namespace std;
-
+ 
 template<typename T>
 class Matrix {
 	protected:
@@ -42,6 +44,7 @@ class Matrix {
 			return cols;
 		}
 };
+
 template<typename T>
 void Gauss(Matrix <T> &m){
 	Matrix <T> temp(m);
@@ -59,6 +62,7 @@ void Gauss(Matrix <T> &m){
 	}
 	printX(m);
 }
+
 template <typename T>
 void Gaussb(Matrix <T> &m){
 	Matrix <T> temp(m);
@@ -91,6 +95,7 @@ void Gaussb(Matrix <T> &m){
 	}
 	printX(m);
 }
+
 template <typename T>
 void Gaussc(Matrix <T> &m){
 	Matrix <T> temp(m);
@@ -147,6 +152,7 @@ void Gaussc(Matrix <T> &m){
   	cout << endl;
 	printX(m, colPosition);
 }
+
 template <typename T>
 void printX(Matrix <T> &m){
 	vector <T> x;
@@ -171,6 +177,7 @@ void printX(Matrix <T> &m){
     	iter++;
 	}
 }
+
 template <typename T>
 void printX(Matrix <T> &m, vector<unsigned> colPosition){
 	vector <T> x;
@@ -200,11 +207,39 @@ void printX(Matrix <T> &m, vector<unsigned> colPosition){
 		}
 	}
 }
+
 int main(int argc, char const *argv[])
 {
-	Matrix <float> m(1500,1501);
- 	Matrix <float> n=m;
-	Gauss(m);
-	Gaussc(n);        
-	return 0;
+    /*Matrix <float> m(1500,1501);
+    Matrix <float> n=m;
+    Gauss(m);
+    Gaussc(n);*/
+
+    //mpz_int a1("50000000000000000000000"), a2("70000000000000000000000"),b1("170000000000000000000000"), b2("890000000000000000000000");
+    
+    Fraction a(75,50);
+    Fraction b(93,46);
+    Fraction c;
+
+    c = DoubleToFraction(0.75);
+    cout << c << "\t(converted from 0.75 double)" << endl;
+
+    c = a + b;
+    cout << c << "\t(75/50 + 93/46)" << endl;
+
+    c = a - b;
+    cout << c << "\t(75/50 - 93/46)" << endl;
+
+    c = a * b;
+    cout << c << "\t(75/50 * 93/46)" << endl;
+
+    c = a / b;
+    cout << c << "\t(75/50 / 93/46)" << endl;
+
+    cout <<         (int)c << "\t(75/50 / 93/46) - int floor" << endl;
+    cout <<       (float)c << "\t(75/50 / 93/46) - float" << endl;
+    cout <<      (double)c << "\t(75/50 / 93/46) - double" << endl;
+    cout << (long double)c << "\t(75/50 / 93/46) - long double" << endl;
+
+    return 0;
 }
