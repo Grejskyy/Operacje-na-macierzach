@@ -2,10 +2,11 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include <Eigen/Dense>
 #include "fraction.cpp"
 
-using namespace boost::multiprecision;
 using namespace std;
+using namespace boost::multiprecision;
  
 template<typename T>
 class Matrix {
@@ -210,13 +211,20 @@ void printX(Matrix <T> &m, vector<unsigned> colPosition){
 
 int main(int argc, char const *argv[])
 {
-    /*Matrix <float> m(1500,1501);
+	Matrix <float> m(1500,1501);
     Matrix <float> n=m;
     Gauss(m);
-    Gaussc(n);*/
+    Gaussc(n);
 
     //mpz_int a1("50000000000000000000000"), a2("70000000000000000000000"),b1("170000000000000000000000"), b2("890000000000000000000000");
     
+	Eigen::MatrixXd g(2,2);
+  	g(0,0) = 3;
+  	g(1,0) = 2.5;
+  	g(0,1) = -1;
+  	g(1,1) = m(1,0) + m(0,1);
+  	cout << g << "\t Eigen test" << endl;
+
     Fraction a(75,50);
     Fraction b(93,46);
     Fraction c;
