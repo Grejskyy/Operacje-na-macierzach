@@ -66,7 +66,7 @@ Fraction DoubleToFraction(double input){
     mpz_int numerator = first / gcd_;
 
     Fraction tmp(numerator,denominator);
-            
+
     return tmp;
 }
 
@@ -129,6 +129,12 @@ Fraction operator/(const Fraction& lhs, const Fraction& rhs) {
     return tmp;
 }
 
+bool operator>(const Fraction& lhs, const Fraction& rhs) {
+    Fraction temp1 = lhs;
+    Fraction temp2 = rhs;
+    return (long double)temp1 > (long double)temp2;
+}
+
 std::ostream& operator<<(std::ostream &strm, const Fraction &a) {
     if (a.denominator == 1) {
         strm << a.numerator;
@@ -136,4 +142,8 @@ std::ostream& operator<<(std::ostream &strm, const Fraction &a) {
         strm << a.numerator << "/" << a.denominator;
     }
     return strm;
+}
+Fraction giveFraction(int a, int b){
+    Fraction temp(a,b);
+    return temp;
 }

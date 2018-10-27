@@ -10,26 +10,29 @@ using namespace std;
 template<typename T>
 class Matrix {
 	protected:
+		
+		
+	public:
 		unsigned rows, cols;
 		vector <T> data; 
-	public:
 		Matrix(unsigned rows, unsigned cols)
 			: rows(rows)
 			, cols(cols)
 			{
-				random_device rd;  
-    			mt19937 gen(rd()); 
-    			uniform_real_distribution<> dis(-1, 1);
+				random_device rd;
+    			mt19937 gen(rd());
+    			uniform_int_distribution<> dis(-65536, 65535);
 				for (int i = 0; i < rows*cols; ++i)
 				{
-					data.push_back(dis(gen));
+					data.push_back(giveFraction(dis(gen),65536));
+					cout << i << endl;
 				}
 			}
 		Matrix(const Matrix &obj)
 		: rows(obj.rows)
 		, cols(obj.cols)
 		{
-			data = obj.data;
+			data =obj.data;
 		}
 		~Matrix()
 		{
@@ -167,13 +170,13 @@ void printX(Matrix <T> &m){
 		{
 			value -= m(row - i, col - j)*x[j-2];
 		}
-		value /= m(row - i, col - (i+1));
+		value = value / m(row - i, col - (i+1));
 		x.push_back(value);
 	}
 	reverse(x.begin(), x.end());
 	unsigned iter = 1;
 	for (it=x.begin(); it!=x.end(); ++it){
-    	cout<< "x"  << iter << ": " << *it << endl;
+    	cout<< "x"  << iter << ": " << (double)*it << endl;
     	iter++;
 	}
 }
@@ -192,7 +195,7 @@ void printX(Matrix <T> &m, vector<unsigned> colPosition){
 		{
 			value -= m(row - i, col - j)*x[j-2];
 		}
-		value /= m(row - i, col - (i+1));
+		value = value / m(row - i, col - (i+1));
 		x.push_back(value);
 	}
 	reverse(x.begin(), x.end());
@@ -201,7 +204,7 @@ void printX(Matrix <T> &m, vector<unsigned> colPosition){
 		for (int j = 0; j < x.size(); ++j)
 		{
 			if(colPosition[j] == i){
-					cout<< "x"  << i+1 << ": " << x[j] << endl;
+					cout<< "x"  << i+1 << ": " << (double)x[j] << endl;
 					break; 
 			}
 		}
@@ -210,36 +213,28 @@ void printX(Matrix <T> &m, vector<unsigned> colPosition){
 
 int main(int argc, char const *argv[])
 {
-    /*Matrix <float> m(1500,1501);
-    Matrix <float> n=m;
+    Matrix <Fraction> m(300,301);
+					// m.data.push_back(giveFraction(-1,1));
+					// m.data.push_back(giveFraction(2,1));
+					// m.data.push_back(giveFraction(1,1));
+					// m.data.push_back(giveFraction(-1,1));
+					// m.data.push_back(giveFraction(1,1));
+					// m.data.push_back(giveFraction(-3,1));
+					// m.data.push_back(giveFraction(-2,1));
+					// m.data.push_back(giveFraction(-1,1));
+					// m.data.push_back(giveFraction(3,1));
+					// m.data.push_back(giveFraction(-1,1));
+					// m.data.push_back(giveFraction(-1,1));
+					// m.data.push_back(giveFraction(4,1));
+//CHWILOWE RZUTOWANIE NA ODPIERDOL					
+    Matrix <double> n(0,0);
+     n.rows = m.rows;
+	n.cols = m.cols;
+    for (int i = 0; i < m.rows*m.cols; ++i)
+    {
+    	n.data.push_back((double)m.data[i]);
+    }
     Gauss(m);
-    Gaussc(n);*/
-
-    //mpz_int a1("50000000000000000000000"), a2("70000000000000000000000"),b1("170000000000000000000000"), b2("890000000000000000000000");
-    
-    Fraction a(75,50);
-    Fraction b(93,46);
-    Fraction c;
-
-    c = DoubleToFraction(0.75);
-    cout << c << "\t(converted from 0.75 double)" << endl;
-
-    c = a + b;
-    cout << c << "\t(75/50 + 93/46)" << endl;
-
-    c = a - b;
-    cout << c << "\t(75/50 - 93/46)" << endl;
-
-    c = a * b;
-    cout << c << "\t(75/50 * 93/46)" << endl;
-
-    c = a / b;
-    cout << c << "\t(75/50 / 93/46)" << endl;
-
-    cout <<         (int)c << "\t(75/50 / 93/46) - int floor" << endl;
-    cout <<       (float)c << "\t(75/50 / 93/46) - float" << endl;
-    cout <<      (double)c << "\t(75/50 / 93/46) - double" << endl;
-    cout << (long double)c << "\t(75/50 / 93/46) - long double" << endl;
-
+    Gauss(n);
     return 0;
 }
