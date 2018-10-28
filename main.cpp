@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include <ctime>
 #include "fraction.cpp"
 
 using namespace boost::multiprecision;
@@ -25,7 +26,7 @@ class Matrix {
 				for (int i = 0; i < rows*cols; ++i)
 				{
 					data.push_back(giveFraction(dis(gen),65536));
-					cout << i << endl;
+					//cout << i << endl;
 				}
 			}
 		Matrix(const Matrix &obj)
@@ -54,12 +55,76 @@ void Gauss(Matrix <T> &m){
   	int n = 0;
   	while(n < m.getRows()){
 		for (int i = n+1; i < m.getRows(); ++i)
-		{
+		{	
 			for (int j = n; j < m.getCols(); ++j)
 			{
 				m(i,j) -= temp(i,n)/temp(n,n)*temp(n,j);
 			}
 		}
+		cout << "Test n = " << n << endl;
+		n++;
+		temp = m;
+	}
+	printX(m);
+}
+
+template<typename T>
+void GaussDouble(Matrix <T> &m){
+	Matrix <T> temp(m);
+  	int n = 0;
+	double div = 0;
+  	while(n < m.getRows()){
+		for (int i = n+1; i < m.getRows(); ++i)
+		{	
+			div = temp(i,n)/temp(n,n);
+			for (int j = n; j < m.getCols(); ++j)
+			{
+				m(i,j) -= div*temp(n,j);
+			}
+		}
+		cout << "Test n = " << n << endl;
+		n++;
+		temp = m;
+	}
+	printX(m);
+}
+
+template<typename T>
+void GaussFr(Matrix <T> &m){
+	Matrix <T> temp(m);
+  	int n = 0;
+	Fraction division(1,1);
+  	while(n < m.getRows()){
+		for (int i = n+1; i < m.getRows(); ++i)
+		{	
+			division = temp(i,n)/temp(n,n);
+			for (int j = n; j < m.getCols(); ++j)
+			{
+				m(i,j) -= division*temp(n,j);
+			}
+		}
+		cout << "Test n = " << n << endl;
+		n++;
+		temp = m;
+	}
+	printX(m);
+}
+
+template<typename T>
+void GaussFr2(Matrix <T> &m){
+	Matrix <T> temp(m);
+  	int n = 0;
+	Fraction division(1,1);
+  	while(n < m.getRows()){
+		for (int i = n+1; i < m.getRows(); ++i)
+		{	
+			division = temp(i,n)/temp(n,n);
+			for (int j = n; j < m.getCols(); ++j)
+			{
+				m(i,j) = gaussMath(m(i,j),division,temp(n,j));
+			}
+		}
+		cout << "Test n = " << n << endl;
 		n++;
 		temp = m;
 	}
@@ -176,7 +241,7 @@ void printX(Matrix <T> &m){
 	reverse(x.begin(), x.end());
 	unsigned iter = 1;
 	for (it=x.begin(); it!=x.end(); ++it){
-    	cout<< "x"  << iter << ": " << (double)*it << endl;
+    	cout<< "x"  << iter << ": " << (long double)*it << endl;
     	iter++;
 	}
 }
@@ -204,7 +269,7 @@ void printX(Matrix <T> &m, vector<unsigned> colPosition){
 		for (int j = 0; j < x.size(); ++j)
 		{
 			if(colPosition[j] == i){
-					cout<< "x"  << i+1 << ": " << (double)x[j] << endl;
+					cout<< "x"  << i+1 << ": " << (long double)x[j] << endl;
 					break; 
 			}
 		}
@@ -213,7 +278,8 @@ void printX(Matrix <T> &m, vector<unsigned> colPosition){
 
 int main(int argc, char const *argv[])
 {
-    Matrix <Fraction> m(300,301);
+	time_t start, end;
+    Matrix <Fraction> m(500,501);
 					// m.data.push_back(giveFraction(-1,1));
 					// m.data.push_back(giveFraction(2,1));
 					// m.data.push_back(giveFraction(1,1));
@@ -234,7 +300,28 @@ int main(int argc, char const *argv[])
     {
     	n.data.push_back((double)m.data[i]);
     }
-    Gauss(m);
-    Gauss(n);
+	cout << "Gauss:" << endl;
+	/*start = clock();
+	Gauss(n);
+	end = clock();
+	double db1time = (static_cast <double>(end - start) / CLOCKS_PER_SEC);*/
+
+	start = clock();
+	GaussDouble(n);
+	end = clock();
+	double db2time = (static_cast <double>(end - start) / CLOCKS_PER_SEC);
+
+	/*start = clock();
+	GaussFr(m);
+	end = clock();
+	double fr1time = (static_cast <double>(end - start) / CLOCKS_PER_SEC);*/
+
+	start = clock();
+	GaussFr2(m);
+	end = clock();
+	//cout << "Double db1: " << db1time << endl;
+	cout << "Double db2: " << db2time << endl;
+	//cout << "Fraction Fr: " << fr1time << endl;
+	cout << "Fraction Fr2: " <<(static_cast <double>(end - start) / CLOCKS_PER_SEC) << endl;
     return 0;
 }

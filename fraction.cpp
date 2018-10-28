@@ -4,14 +4,7 @@ using namespace boost::multiprecision;
 using namespace std;
 
 mpz_int gcd(mpz_int a, mpz_int b) {
-    while (a != b) {
-        if (a > b) {
-            a -= b;
-        } else {
-            b -= a;
-        }
-    }
-    return a;
+    return b == 0 ? a : gcd(b, a % b);
 }
 
 class Fraction {
@@ -67,6 +60,12 @@ Fraction DoubleToFraction(double input){
 
     Fraction tmp(numerator,denominator);
 
+    return tmp;
+}
+
+Fraction gaussMath(Fraction m, Fraction division, Fraction temp){
+    //Fraction tmp(division.numerator * temp.numerator,division.denominator * temp.denominator);
+    Fraction tmp(m.numerator * (division.denominator * temp.denominator) - (division.numerator * temp.numerator) * m.denominator, m.denominator * (division.denominator * temp.denominator));
     return tmp;
 }
 
