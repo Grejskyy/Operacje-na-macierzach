@@ -4,14 +4,7 @@ using namespace boost::multiprecision;
 using namespace std;
 
 mpz_int gcd(mpz_int a, mpz_int b) {
-    while (a != b) {
-        if (a > b) {
-            a -= b;
-        } else {
-            b -= a;
-        }
-    }
-    return a;
+    return b == 0 ? a : gcd(b, a % b);
 }
 
 class Fraction {
@@ -52,6 +45,21 @@ class Fraction {
         operator double() {return numerator.convert_to<double>()/denominator.convert_to<double>();}
         operator long double() {return numerator.convert_to<long double>()/denominator.convert_to<long double>();}
 };
+template <typename T>
+T giveFloat(vector <T> data, int a, int b){
+    Fraction temp(a,b);
+    return (T)temp;
+}
+
+Fraction gaussMath(Fraction &m, Fraction division, Fraction temp){
+    //Fraction tmp(division.numerator * temp.numerator,division.denominator * temp.denominator);
+    Fraction tmp(m.numerator * division.denominator * temp.denominator - division.numerator * temp.numerator * m.denominator, m.denominator * (division.denominator * temp.denominator));
+    return tmp;
+}
+template<typename T>
+T gaussMath(T m, T division, T temp){
+    return m-division*temp;
+}
 
 Fraction DoubleToFraction(double input){
     double integral = std::floor(input);
@@ -71,8 +79,7 @@ Fraction DoubleToFraction(double input){
 }
 
 Fraction operator+(const Fraction& lhs, const Fraction& rhs) {
-    Fraction tmp(lhs.numerator*rhs.denominator
-                +rhs.numerator*lhs.denominator,
+    Fraction tmp(lhs.numerator*rhs.denominator+rhs.numerator*lhs.denominator,
                 lhs.denominator*rhs.denominator);
     return tmp;
 }
@@ -143,7 +150,7 @@ std::ostream& operator<<(std::ostream &strm, const Fraction &a) {
     }
     return strm;
 }
-Fraction giveFraction(int a, int b){
-    Fraction temp(a,b);
+Fraction abs(const Fraction& obj){
+    Fraction temp(abs(obj.numerator),abs(obj.denominator));
     return temp;
 }
