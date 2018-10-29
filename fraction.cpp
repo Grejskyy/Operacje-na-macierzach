@@ -78,6 +78,12 @@ Fraction DoubleToFraction(double input){
     return tmp;
 }
 
+Fraction gaussMath(Fraction m, Fraction division, Fraction temp){
+    //Fraction tmp(division.numerator * temp.numerator,division.denominator * temp.denominator);
+    Fraction tmp(m.numerator * (division.denominator * temp.denominator) - (division.numerator * temp.numerator) * m.denominator, m.denominator * (division.denominator * temp.denominator));
+    return tmp;
+}
+
 Fraction operator+(const Fraction& lhs, const Fraction& rhs) {
     Fraction tmp(lhs.numerator*rhs.denominator+rhs.numerator*lhs.denominator,
                 lhs.denominator*rhs.denominator);
