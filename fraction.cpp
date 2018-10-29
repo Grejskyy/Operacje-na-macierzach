@@ -52,7 +52,6 @@ T giveFloat(vector <T> data, int a, int b){
 }
 
 Fraction gaussMath(Fraction &m, Fraction division, Fraction temp){
-    //Fraction tmp(division.numerator * temp.numerator,division.denominator * temp.denominator);
     Fraction tmp(m.numerator * division.denominator * temp.denominator - division.numerator * temp.numerator * m.denominator, m.denominator * (division.denominator * temp.denominator));
     return tmp;
 }
@@ -61,12 +60,20 @@ T gaussMath(T m, T division, T temp){
     return m-division*temp;
 }
 
-Fraction DoubleToFraction(double input){
-    double integral = std::floor(input);
-    double frac = input - integral;
-
-    const long precision = 1000000000000000000;
-    const long first = round(frac * precision);
+mpf_float CheckErrorValue(mpf_float eigen, Fraction fraction){
+    mpf_float ourFunction = fraction.numerator.convert_to<mpf_float>()/fraction.denominator.convert_to<mpf_float>();
+    mpf_float value = eigen.convert_to<mpf_float>() - ourFunction;
+    return value < 0 ? value *= -1 : value;
+}
+template<typename T>
+mpf_float CheckErrorValue(mpf_float eigen, T dValue){;
+    mpf_float value = eigen - dValue;
+    return value < 0 ? value *= -1 : value;
+}
+/*
+Fraction DoubleToFraction(mpf_float input){
+    mpz_int precision("100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+    mpz_int first(input * precision);
 
     mpz_int gcd_ = gcd(first, precision);
 
@@ -76,7 +83,7 @@ Fraction DoubleToFraction(double input){
     Fraction tmp(numerator,denominator);
 
     return tmp;
-}
+}*/
 
 Fraction operator+(const Fraction& lhs, const Fraction& rhs) {
     Fraction tmp(lhs.numerator*rhs.denominator+rhs.numerator*lhs.denominator,

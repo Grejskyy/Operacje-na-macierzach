@@ -7,7 +7,9 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include <sstream>
 #include <ctime>
+#include <Eigen/Dense>
 #include "fraction.cpp"
 
 using namespace boost::multiprecision;
@@ -71,7 +73,7 @@ class Matrix {
 		}
 };
 template<typename T>
-void Gauss(Matrix <T> &m){
+void Gauss(Matrix <T> &m, Eigen::MatrixXd x){
 	Matrix <T> temp(m);
 	T division;
   	for (int n = 0; n < m.getRows(); ++n)
@@ -84,14 +86,14 @@ void Gauss(Matrix <T> &m){
 				m(i,j) = gaussMath(m(i,j),division,temp(n,j));
 			}
 		}
-		cout << "Test n = " << n << endl;
+		// cout << "Test n = " << n << endl;
 		temp = m;
 	}
-	printX(m);
+	printX(m,x);
 }
 
 template <typename T>
-void Gaussb(Matrix <T> &m){
+void Gaussb(Matrix <T> &m, Eigen::MatrixXd x){
 	Matrix <T> temp(m);
   	int n = 0;
   	int hlp=0;
@@ -121,11 +123,11 @@ void Gaussb(Matrix <T> &m){
 		n++;
 		temp = m;
 	}
-	printX(m);
+	printX(m,x);
 }
 
 template <typename T>
-void Gaussc(Matrix <T> &m){
+void Gaussc(Matrix <T> &m, Eigen::MatrixXd x){
 	Matrix <T> temp(m);
 	
   	int n = 0;
@@ -178,12 +180,11 @@ void Gaussc(Matrix <T> &m){
 		n++;
 		temp = m;
 	}
-  	cout << endl;
-	printX(m, colPosition);
+	printX(m, colPosition, x);
 }
 
 template <typename T>
-void printX(Matrix <T> &m){
+void printX(Matrix <T> &m, Eigen::MatrixXd y){
 	vector <T> x;
 	typename vector <T>::iterator it; 
 	unsigned row = m.getRows();
@@ -202,13 +203,15 @@ void printX(Matrix <T> &m){
 	reverse(x.begin(), x.end());
 	unsigned iter = 1;
 	for (it=x.begin(); it!=x.end(); ++it){
-    	cout<< "x"  << iter << ": " << (long double)*it << endl;
+    	cout<< "err x"  << iter << ": " << CheckErrorValue(y(iter-1),*it) << endl;
+		cout<< "err x double"  << iter << ": " << CheckErrorValue(y(iter-1),(double)*it) << endl;
+		cout<< "err x long double"  << iter << ": " << CheckErrorValue(y(iter-1),(long double)*it) << endl;
     	iter++;
 	}
 }
 
 template <typename T>
-void printX(Matrix <T> &m, vector<unsigned> colPosition){
+void printX(Matrix <T> &m, vector<unsigned> colPosition, Eigen::MatrixXd y){
 	vector <T> x;
 	typename vector <T>::iterator it; 
 	unsigned row = m.getRows();
@@ -230,7 +233,9 @@ void printX(Matrix <T> &m, vector<unsigned> colPosition){
 		for (int j = 0; j < x.size(); ++j)
 		{
 			if(colPosition[j] == i){
-					cout<< "x"  << i+1 << ": " << (long double)x[j] << endl;
+					cout<< "err x"  << i+1 << ": " << CheckErrorValue(y(i),x[j]) << endl;
+					cout<< "err x double"  << i+1 << ": " << CheckErrorValue(y(i),(double)x[j]) << endl;
+					cout<< "err x long double"  << i+1 << ": " << CheckErrorValue(y(i),(long double)x[j]) << endl;
 					break; 
 			}
 		}
@@ -239,7 +244,9 @@ void printX(Matrix <T> &m, vector<unsigned> colPosition){
 
 int main(int argc, char const *argv[])
 {
-	int size = 40;
+	istringstream ss(argv[1]);
+	int size;
+	ss >> size;
 	time_t start, end;
     Matrix <Fraction> U1(size,size+1);
     Matrix <Fraction> U2(U1);
@@ -250,43 +257,69 @@ int main(int argc, char const *argv[])
     Matrix <float> F1(U1);
     Matrix <float> F2(F1);
     Matrix <float> F3(F2);
+    Eigen::MatrixXd eig(size, size);
+    Eigen::VectorXd vec(size);
+    for (int i = 0; i < size; ++i)
+    {
+    	for (int j = 0; j < size; ++j)
+    	{
+    		eig(i,j) = D1(i,j);
+    	}
+    	vec(i) = D1(i,size);
+    }
+    cout << "Here is the matrix A:\n" << eig << endl;
+    cout << "Here is the vector b:\n" << vec << endl;
+    Eigen::MatrixXd x = eig.colPivHouseholderQr().solve(vec);
+    cout << "The solution is:\n" << x << endl;
+
+	cout << "Gauss fraction //" << endl;
 	start = clock();
-	Gauss(U1);
+	Gauss(U1,x);
 	end = clock();
 	double U1Time = (static_cast <double>(end - start) / CLOCKS_PER_SEC);
+	cout << "Gauss2 fraction //" << endl;
 	start = clock();
-	Gaussb(U2);
+	Gaussb(U2,x);
 	end = clock();
 	double U2Time = (static_cast <double>(end - start) / CLOCKS_PER_SEC);
+	cout << "Gauss3 fraction //" << endl;
 	start = clock();
-	Gaussc(U3);
+	Gaussc(U3,x);
 	end = clock();
 	double U3Time = (static_cast <double>(end - start) / CLOCKS_PER_SEC);
+	
+	cout << "Gauss double //" << endl;
 	start = clock();
-	Gauss(D1);
+	Gauss(D1,x);
 	end = clock();
 	double D1Time = (static_cast <double>(end - start) / CLOCKS_PER_SEC);
+	cout << "Gauss2 double //" << endl;
 	start = clock();
-	Gaussb(D2);
+	Gaussb(D2,x);
 	end = clock();
 	double D2Time = (static_cast <double>(end - start) / CLOCKS_PER_SEC);
+	cout << "Gauss3 double //" << endl;
 	start = clock();
-	Gaussc(D3);
+	Gaussc(D3,x);
 	end = clock();
 	double D3Time = (static_cast <double>(end - start) / CLOCKS_PER_SEC);
+
+	cout << "Gauss float //" << endl;
 	start = clock();
-	Gauss(F1);
+	Gauss(F1,x);
 	end = clock();
 	double F1Time = (static_cast <double>(end - start) / CLOCKS_PER_SEC);
+	cout << "Gauss2 float //" << endl;
 	start = clock();
-	Gaussb(F2);
+	Gaussb(F2,x);
 	end = clock();
 	double F2Time = (static_cast <double>(end - start) / CLOCKS_PER_SEC);
+	cout << "Gauss3 float //" << endl;
 	start = clock();
-	Gaussc(F3);
+	Gaussc(F3,x);
 	end = clock();
 	double F3Time = (static_cast <double>(end - start) / CLOCKS_PER_SEC);
-	start = clock();
+
 	cout << "Matrix size: " << size << "x" << size << endl;
 	cout << "Fraction Gauss1: " << U1Time << endl;
 	cout << "Fraction Gauss2: " << U2Time << endl;
