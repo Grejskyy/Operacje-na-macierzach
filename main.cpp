@@ -9,6 +9,7 @@
 #include <random>
 #include <ctime>
 #include "fraction.cpp"
+#include <Eigen/Dense>
 
 using namespace boost::multiprecision;
 using namespace std;
@@ -84,7 +85,7 @@ void Gauss(Matrix <T> &m){
 				m(i,j) = gaussMath(m(i,j),division,temp(n,j));
 			}
 		}
-		cout << "Test n = " << n << endl;
+		// cout << "Test n = " << n << endl;
 		temp = m;
 	}
 	printX(m);
@@ -239,7 +240,7 @@ void printX(Matrix <T> &m, vector<unsigned> colPosition){
 
 int main(int argc, char const *argv[])
 {
-	int size = 40;
+	int size = 5;
 	time_t start, end;
     Matrix <Fraction> U1(size,size+1);
     Matrix <Fraction> U2(U1);
@@ -250,6 +251,20 @@ int main(int argc, char const *argv[])
     Matrix <float> F1(U1);
     Matrix <float> F2(F1);
     Matrix <float> F3(F2);
+    Eigen::MatrixXd eig(size, size);
+    Eigen::MatrixXd vec(size, 1);
+    for (int i = 0; i < size; ++i)
+    {
+    	for (int j = 0; j < size; ++j)
+    	{
+    		eig(i,j) = D1(i,j);
+    	}
+    	vec(i,0) = D1(i,size);
+    }
+    // cout << "Here is the matrix A:\n" << eig << endl;
+    // cout << "Here is the vector b:\n" << vec << endl;
+    Eigen::MatrixXd x = eig.colPivHouseholderQr().solve(vec);
+    cout << "The solution is:\n" << x << endl;
 	start = clock();
 	Gauss(U1);
 	end = clock();
@@ -286,7 +301,6 @@ int main(int argc, char const *argv[])
 	Gaussc(F3);
 	end = clock();
 	double F3Time = (static_cast <double>(end - start) / CLOCKS_PER_SEC);
-	start = clock();
 	cout << "Matrix size: " << size << "x" << size << endl;
 	cout << "Fraction Gauss1: " << U1Time << endl;
 	cout << "Fraction Gauss2: " << U2Time << endl;
