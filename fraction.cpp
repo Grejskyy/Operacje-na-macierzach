@@ -70,20 +70,11 @@ mpf_float CheckErrorValue(mpf_float eigen, T dValue){;
     mpf_float value = eigen - dValue;
     return value < 0 ? value *= -1 : value;
 }
-/*
-Fraction DoubleToFraction(mpf_float input){
-    mpz_int precision("100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
-    mpz_int first(input * precision);
 
-    mpz_int gcd_ = gcd(first, precision);
-
-    mpz_int denominator = precision / gcd_;
-    mpz_int numerator = first / gcd_;
-
-    Fraction tmp(numerator,denominator);
-
-    return tmp;
-}*/
+Fraction abs(const Fraction& obj){
+    Fraction temp(abs(obj.numerator),abs(obj.denominator));
+    return temp;
+}
 
 Fraction operator+(const Fraction& lhs, const Fraction& rhs) {
     Fraction tmp(lhs.numerator*rhs.denominator+rhs.numerator*lhs.denominator,
@@ -156,8 +147,4 @@ std::ostream& operator<<(std::ostream &strm, const Fraction &a) {
         strm << a.numerator << "/" << a.denominator;
     }
     return strm;
-}
-Fraction abs(const Fraction& obj){
-    Fraction temp(abs(obj.numerator),abs(obj.denominator));
-    return temp;
 }
